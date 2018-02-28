@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>php</title>
+	<meta http-equiv="content-type" content="text/html;charset=utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="css/index.css">
+	<style type="text/css">
+		.title{
+			color:#d5455e;
+			text-align: center;
+		}
+		.chapters{
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+		.chapters li{
+			text-align: center;
+			padding: 5px;
+			box-sizing: border-box;
+		}
+		.chapters li a{
+			color:#d5455e;
+			text-decoration: none;
+		}
+	</style>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/common.js"></script>
+    <script>
+		$(document).ready(function(){
+			var id = 404243;
+			if(id == ""){
+				alert("信息错误");
+			}else{
+				$.ajax({
+					url:"function.php",
+					type:'post',
+					data:{"id":id,"type":"kc"},
+					dataType:'json',
+					timeout : 6000000, //超时时间设置，单位毫秒
+					success:function(data){
+						console.log(id);
+						if(data["code"] != 200){
+							$(".title").find("table").html("<caption>"+data["msg"]+"</caption>");
+						}else{
+							$(".title").html(data['title'])
+							for(var i = 0;i<data["data"].length;i++){
+								$(".chapters").append("<li><a href='info.html?id="+data["data"][i]["id"]+"&bid="+id+"'>"+data["data"][i]["title_two"]+"</a></li>");
+							}
+						}
+						if(getCookie(id+"sh") != null){
+							$(window).scrollTop(getCookie(id+"sh"));
+						}
+					},
+					error:function(data){
+						alert("系统错误");
+					},
+					complete : function(XMLHttpRequest,status){ //请求完成后最终执行参数
+						console.log(status);
+				　　　　if(status=='timeout'){//超时,status还有success,error等值的情况
+				　　　　　  alert("超时");
+				　　　　}
+				　　}
+				})
+			}
+			//滚动高度记忆
+			$(window).scroll(function(){
+				var sh = getScrollTop();
+				setCookie(id+"sh",sh);
+			})
+		})
+
+    </script>
+</head>
+<body>
+	<h1 class="title"></h1>
+	<ul class="chapters">
+	</ul>
+	<div class="msg"></div>
+</body>
+</html>

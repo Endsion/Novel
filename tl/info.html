@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>php</title>
+	<meta http-equiv="content-type" content="text/html;charset=utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="css/index.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style type="text/css">
+		body{
+			background: #e2e3f3;
+			font-family: 宋体, Arial;
+		}
+		.title{
+			color:#d5455e;
+			text-align: center;
+		}
+		.chapters{
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+		.chapters li{
+			text-align: center;
+			padding: 5px;
+			box-sizing: border-box;
+		}
+		.chapters li a{
+			color:#d5455e;
+			text-decoration: none;
+		}
+		.content{
+			padding: 10px;
+			box-sizing: border-box;
+			width: 100%;
+			background: #e2e3f3;
+		}
+		.content p {
+			color: #d5455e;
+			color: #000;
+			text-indent: 2em;
+			font-size: 16px;
+		}
+		.desk{
+			position: fixed;
+			width: 100%;
+			height: 100%;
+			top:0;
+			left:0;
+			display: none;
+		}
+		.desk .curtainf{
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			z-index: 100;
+			top:0;
+			left:0;
+			background: #000;
+			opacity: 0.4;
+		}
+		.desk .control{
+			position: absolute;
+			z-index: 100;
+			top:170px;
+			left: 50%;
+			background: #fff;
+			margin-left: -86px;
+		}
+		.desk .control ul{
+			list-style: none;
+			margin:0;
+			padding: 20px;
+		}
+		.desk .control ul li{
+			padding: 5px 0;
+		}
+		.desk .control ul li span{
+			padding: 5px 8px;
+			border:1px solid #d5455e;
+			display: inline-block;
+			margin-left: 5px;
+			border-radius: 3px;
+		}
+		.desk .control ul li span.active{
+			color:#fff;
+			background:#d5455e;
+		}
+		.tm{
+			overflow: hidden;
+			padding: 0 20px;
+			text-align: center;
+		}
+		.tm a{
+			border:1px solid #d5455e;
+			color:#d5455e;
+			text-decoration: none;
+			padding: 5px 8px;
+			display: inline-block;
+		}
+		.tm .prev{float: left;}
+		.tm .next{float: right;}
+		.huhuan{
+			padding:5px;
+			display: inline-block;
+			position: fixed;
+			right: 0;
+			bottom: 70px;
+			background: rgba(255, 255, 255, 0.61);
+			width: 32px;
+    		height: 32px;
+			box-sizing: border-box;
+			border-radius: 50%;
+			text-align: center;
+		}
+		.huhuan span{
+			width: 20px;
+			height: 20px;
+			box-sizing: border-box;
+			display: inline-block;
+			background: #fff;
+			border-radius: 50%;
+		}
+	</style>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/common.js"></script>
+</head>
+<body>
+	<h1 class="title"></h1>
+	<div class="tm">
+	</div>
+	<div class="content"></div>
+	<div class="tm">
+	</div>
+	<div id="bdtts_div_id">
+	</div>
+	<div class="huhuan">
+		<span></span>
+	</div>
+	<div class="desk">
+		<div class="curtainf">
+		</div>
+		<div class="control">
+			<ul>
+				<li><span data-lg="1" class="active">播放</span><span data-lg="2">暂停</span></li>
+				<li><span data-lg="3">正常</span><span data-lg="4"  class="active">快速</span><span data-lg="5">极快</span></li>
+			</ul>
+		</div>
+	</div>
+	<script type="text/javascript">
+		var pi = 0; 
+		var playstate = true;
+		var show = false;
+		var spd = 7;
+		var bid = 0;
+		var id = 0;
+		$(document).ready(function(){
+			bid = getUrlParam("bid");
+			id = getUrlParam("id");
+			if(getCookie(bid+id+"ps") != null){
+				playstate = getCookie(bid+id+"ps") == "true" ? true : false;
+			}
+			if(getCookie(bid+id+"spd") != null){
+				spd = Number(getCookie(bid+id+"spd"));
+			}
+			$.ajax({
+				url:"function.php",
+				type:'post',
+				data:{"id":id,"bid":bid,"type":"getContent"},
+				dataType:'json',
+				success:function(data){
+					$(".title").find("table").html("");
+					if(data["code"] != 200){
+						$(".title").find("table").html("<caption>"+data["msg"]+"</caption>");
+					}else{
+						$(".title").html(data["data"]["chaptername"]);
+						if(data["data"]["prev"].length>0){
+							$(".tm").append("<a class='prev' href='info.html?id="+data["data"]["prev"]+"&bid="+bid+"'>上一章</a>");
+						}else{
+							$(".tm").append("<a class='prev' href='book.html?id="+bid+"'>上一章</a>");
+						}
+						if(bid == "404243"){
+							$(".tm").append("<a href='kc.html'>章节列表</a>");
+						}else{
+							$(".tm").append("<a href='book.html?id="+bid+"'>章节列表</a>");
+						}
+						if(data["data"]["next"].length>0){
+							$(".tm").append("<a class='next' href='info.html?id="+data["data"]["next"]+"&bid="+bid+"'>下一章</a>");
+						}else{
+							$(".tm").append("<a class='next' href='book.html?id="+bid+"'>下一章</a>");
+						}
+						//$(".content").html(data["data"]["content"]);
+						//data["data"]["content"] = data["data"]["content"].replace(' ','t');
+						data["data"]["content"] = data["data"]["content"].split(/\s+/);
+						for(var i=0;i<data["data"]["content"].length;i++){
+							if(data["data"]["content"][i].length <=0){
+								continue;
+							}
+							$(".content").append("<p data-pi='"+i+"'>"+data["data"]["content"][i]+"</p>");
+						}
+						doTTS();
+						$("body").unbind("click").bind("click",function(){
+							if(show){
+								show = false;
+								$(".desk").css("display","none");
+							}else{
+								show = true;
+								$(".desk").css("display","block");
+							}
+						})
+						$(".content").find("p").bind("click",function(){
+							if(playstate == false){
+								pi = Number($(this).attr("data-pi")) -1;
+							}
+						})
+					}
+				},
+				error:function(data){
+					alert("系统错误");
+				}
+			})
+		})
+		function doTTS(){
+			var ttsDiv = document.getElementById('bdtts_div_id');
+			var ttsAudio = document.getElementById('tts_autio_id');
+			if(playstate){
+				var ttsText = $(".content").find("p").eq(pi).html();
+				if($(".content").find("p").length<=pi){
+					location.href = $(".next").attr("href");
+					return;
+				}
+				$(".content").find("p").removeAttr("style");
+				$(".content").find("p").eq(pi).css({"background":"#d5455e","color":"#fff"})
+				if($(".content").find("p").eq(pi).offset().top > window.screen.height){
+					$(document).scrollTop($(".content").find("p").eq(pi).offset().top - window.screen.height/2);
+				}
+				// 这样为什么替换不了播放内容
+				/*var ssrcc = 'http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=10&text='+ttsText;
+				document.getElementById('tts_source_id').src=ssrcc;*/
+				
+				// 这样就可实现播放内容的替换了
+				if(ttsAudio != null){
+					ttsDiv.removeChild(ttsAudio);
+				}
+				var au1 = '<audio id="tts_autio_id" autoplay="autoplay">';
+				var sss = '<source id="tts_source_id" src="http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd='+spd+'&text='+ttsText+'" type="audio/mpeg">';
+				var eee = '<embed id="tts_embed_id" height="0" width="0" src="">';
+				var au2 = '</audio>';
+				ttsDiv.innerHTML = au1 + sss + eee + au2;
+				
+				ttsAudio = document.getElementById('tts_autio_id');
+				
+				ttsAudio.play();
+				ttsAudio.onended = function(){
+					pi++;
+					doTTS();
+				}
+			}
+			$(".desk").find(".control").find("*").bind("click",function(e){
+				window.event? window.event.cancelBubble = true : e.stopPropagation();
+			})
+			$(".tm a").bind("click",function(e){
+				window.event? window.event.cancelBubble = true : e.stopPropagation();
+			})
+			$(".desk").find("span").unbind("click").bind("click",function(e){
+
+				var lg = $(this).attr("data-lg");
+				switch(lg){
+					case "1":
+						if(playstate){
+							return;
+						}
+						playstate = true;
+						$(".desk").find("li").eq(0).find("span").removeClass("active");
+						$(this).attr("class","active");
+						doTTS();
+						setCookie(bid+id+"ps",playstate);
+						/*
+						ttsAudio.play();*/
+						break;
+					case "2":
+						if(playstate){
+							ttsAudio.pause();
+							playstate = false;
+							setCookie(bid+id+"ps",playstate);
+						}
+						$(".desk").find("li").eq(0).find("span").removeClass("active");
+						$(this).attr("class","active");
+						break;
+					case "3":
+						spd = 5;
+						$(".desk").find("li").eq(1).find("span").removeClass("active");
+						$(this).attr("class","active");
+						setCookie(bid+id+"spd",spd);
+						break;
+					case "4":
+						spd = 7;
+						$(".desk").find("li").eq(1).find("span").removeClass("active");
+						$(this).attr("class","active");
+						setCookie(bid+id+"spd",spd);
+						break;
+					case "5":
+						spd = 9;
+						$(".desk").find("li").eq(1).find("span").removeClass("active");
+						$(this).attr("class","active");
+						setCookie(bid+id+"spd",spd);
+						break;
+				}
+				window.event? window.event.cancelBubble = true : e.stopPropagation();
+			})
+		}
+		window.onerror = function(errorMessage, scriptURI, lineNumber,columnNumber,errorObj) {
+	       	console.log("错误信息：" , errorMessage);
+	       	console.log("出错文件：" , scriptURI);
+	       	console.log("出错行号：" , lineNumber);
+	       	console.log("出错列号：" , columnNumber);
+	       	console.log("错误详情：" , errorObj);
+			doTTS();
+	    }
+	</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+body{padding: 0;font-size: 14px;margin: 0;}
+.searhblock{text-align: center;padding: 70px 0 40px;}
+.searhblock div{overflow: hidden;display: inline-block;}
+.searhblock input{padding: 4px;float: left;border: 1px solid #d5455e;width: 200px;}
+.searhblock span{display: inline-block;padding: 3px;border:1px solid #d5455e;background: #d5455e;float: left;color:#fff;width: 40px;}
+.title table{width: 100%;font-size: 15px;}
+.title table td{text-align: center;}
+.title table td a{color:#d5455e;text-decoration: none;}
