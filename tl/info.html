@@ -158,7 +158,7 @@
 		$(document).ready(function(){
 			bid = getUrlParam("bid");
 			id = getUrlParam("id");
-			if(getCookie(bid+id+"ps") != null){
+			if(getCookie(bid+"ps") != null){
 				playstate = getCookie(bid+id+"ps") == "true" ? true : false;
 			}
 			if(getCookie(bid+id+"spd") != null){
@@ -275,7 +275,7 @@
 						$(".desk").find("li").eq(0).find("span").removeClass("active");
 						$(this).attr("class","active");
 						doTTS();
-						setCookie(bid+id+"ps",playstate);
+						setCookie(bid+"ps",playstate);
 						/*
 						ttsAudio.play();*/
 						break;
@@ -283,7 +283,7 @@
 						if(playstate){
 							ttsAudio.pause();
 							playstate = false;
-							setCookie(bid+id+"ps",playstate);
+							setCookie(bid+"ps",playstate);
 						}
 						$(".desk").find("li").eq(0).find("span").removeClass("active");
 						$(this).attr("class","active");
